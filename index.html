@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>NeoGrocery Pro · Bootstrap · Pay on Invoice</title>
+    <title>NeoGrocery Pro · Bootstrap · versioned saved invoices</title>
     <!-- Bootstrap 5 + Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -249,6 +249,23 @@
             z-index: 9999;
             white-space: nowrap;
         }
+        .saved-invoice-link {
+            background: #e8f2ff;
+            border-radius: 60px;
+            padding: 16px 24px;
+            margin-top: 30px;
+            text-align: center;
+            word-break: break-all;
+        }
+        .saved-invoice-link a {
+            color: #0f3a5e;
+            font-weight: 600;
+            text-decoration: none;
+            border-bottom: 2px solid #fb5;
+            margin: 0 8px 8px 0;
+            display: inline-block;
+        }
+        .saved-invoice-link a:hover { color: #1f5282; }
         /* Payment modal */
         .payment-modal .modal-content {
             border-radius: 40px;
@@ -488,14 +505,106 @@
                 localStorage.setItem('invoiceHistory', JSON.stringify(history));
             }
 
+            // ---------- SAVED INVOICES (24h storage with versioning) ----------
+            const SAVED_INVOICES_KEY = 'savedInvoices';
+            
+            function generateUniqueFileName(baseName, existingFiles) {
+                // baseName example: invoice_Guest_2026-03-08.json
+                const extIndex = baseName.lastIndexOf('.json');
+                const namePart = baseName.substring(0, extIndex);
+                
+                // Check if baseName exists
+                if (!existingFiles.includes(baseName)) {
+                    return baseName;
+                }
+                
+                // Find the highest version number
+                let maxVersion = 0;
+                const pattern = new RegExp(`^${namePart.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}-(\\d+)\\.json$`);
+                
+                existingFiles.forEach(file => {
+                    const match = file.match(pattern);
+                    if (match) {
+                        const version = parseInt(match[1], 10);
+                        if (version > maxVersion) maxVersion = version;
+                    }
+                });
+                
+                // If baseName exists but no numbered versions yet, start with -1
+                if (existingFiles.includes(baseName) && maxVersion === 0) {
+                    return `${namePart}-1.json`;
+                }
+                
+                // Otherwise increment the highest version
+                return `${namePart}-${maxVersion + 1}.json`;
+            }
+            
+            function saveInvoiceFor24h(invoiceData, desiredFileName) {
+                const saved = getAllSavedInvoices();
+                const existingFileNames = saved.map(item => item.fileName);
+                
+                // Generate unique filename
+                const uniqueFileName = generateUniqueFileName(desiredFileName, existingFileNames);
+                
+                const expires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+                saved.push({
+                    fileName: uniqueFileName,
+                    data: invoiceData,
+                    expires: expires,
+                    timestamp: Date.now()
+                });
+                
+                // Clean expired ones
+                const valid = saved.filter(item => item.expires > Date.now());
+                localStorage.setItem(SAVED_INVOICES_KEY, JSON.stringify(valid));
+                return uniqueFileName;
+            }
+            
+            function getAllSavedInvoices() {
+                try {
+                    const saved = localStorage.getItem(SAVED_INVOICES_KEY);
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        // Filter out expired
+                        const valid = parsed.filter(item => item.expires > Date.now());
+                        if (valid.length !== parsed.length) {
+                            localStorage.setItem(SAVED_INVOICES_KEY, JSON.stringify(valid));
+                        }
+                        return valid;
+                    }
+                } catch (e) {}
+                return [];
+            }
+            
+            function getSavedInvoiceByFileName(fileName) {
+                const saved = getAllSavedInvoices();
+                return saved.find(item => item.fileName === fileName);
+            }
+
             const urlParams = new URLSearchParams(window.location.search);
             const view = urlParams.get('view');
+            const loadFile = urlParams.get('load');
             const container = document.getElementById('appContainer');
 
-            // ---------- INVOICE PAGE (with Pay button & modal) ----------
+            // ---------- LOAD SAVED INVOICE IF REQUESTED ----------
+            if (loadFile) {
+                const saved = getSavedInvoiceByFileName(loadFile);
+                if (saved) {
+                    // Override URL params to show invoice view with saved data
+                    sessionStorage.setItem('currentInvoice', JSON.stringify({ 
+                        cart: saved.data.cart, 
+                        discountApplied: saved.data.discountApplied 
+                    }));
+                    window.location.href = `?view=invoice&name=${encodeURIComponent(saved.data.customerName)}&date=${saved.data.date}&saved=${encodeURIComponent(loadFile)}`;
+                    return;
+                }
+            }
+
+            // ---------- INVOICE PAGE (with versioned Save) ----------
             if (view === 'invoice') {
                 const customerName = urlParams.get('name') || 'Guest';
                 const date = urlParams.get('date') || new Date().toLocaleDateString('en-GB');
+                const savedFileParam = urlParams.get('saved') || '';
                 let cart = [];
                 let discountApplied = 0;
                 try {
@@ -517,6 +626,10 @@
                 const discount = discountApplied ? subtotal * 0.1 : 0;
                 const total = subtotal - discount;
 
+                // Generate a base filename for saving
+                const safeDate = date.replace(/\//g, '-');
+                const baseFileName = `invoice_${customerName}_${safeDate}.json`;
+
                 let historyHtml = '';
                 try {
                     const history = JSON.parse(localStorage.getItem('invoiceHistory')) || [];
@@ -527,6 +640,23 @@
                         historyHtml = `<div class="mt-5 p-4" style="background:#e8f2ff; border-radius:48px;"><h5 class="mb-3"><i class="bi bi-clock-history"></i> Previous purchases</h5><div>${links}</div></div>`;
                     }
                 } catch(e) {}
+
+                // Show saved file links (all non-expired)
+                let savedLinkHtml = '';
+                const savedInvoices = getAllSavedInvoices();
+                if (savedInvoices.length > 0) {
+                    // Sort by timestamp descending (newest first)
+                    savedInvoices.sort((a, b) => b.timestamp - a.timestamp);
+                    const links = savedInvoices.map(item => 
+                        `<a href="?load=${encodeURIComponent(item.fileName)}" class="d-inline-block me-3 mb-2">📄 ${item.fileName}</a>`
+                    ).join('');
+                    savedLinkHtml = `
+                        <div class="saved-invoice-link">
+                            <i class="bi bi-files"></i> <strong>Saved invoices (24h):</strong><br>
+                            ${links}
+                        </div>
+                    `;
+                }
 
                 const invoiceHtml = `
                     <div class="invoice-container">
@@ -553,26 +683,37 @@
                         <div class="d-flex gap-3 flex-wrap justify-content-center mb-4">
                             <button class="btn btn-primary-custom" id="payInvoiceBtn"><i class="bi bi-credit-card"></i> Pay now</button>
                             <button class="btn btn-outline-custom" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>
-                            <button class="btn btn-outline-custom" id="saveInvoiceBtn"><i class="bi bi-download"></i> Save JSON</button>
+                            <button class="btn btn-outline-custom" id="saveInvoiceBtn"><i class="bi bi-save"></i> Save</button>
                             <a href="?view=" class="btn btn-outline-custom"><i class="bi bi-arrow-left"></i> Continue shopping</a>
                         </div>
+                        
+                        <!-- Saved invoices links (24h) -->
+                        ${savedLinkHtml}
                         
                         ${historyHtml}
                     </div>
                 `;
                 container.innerHTML = invoiceHtml;
 
-                // Save JSON
+                // Save button: store in localStorage for 24h with versioned filename
                 document.getElementById('saveInvoiceBtn')?.addEventListener('click', () => {
-                    const invoiceData = { customerName, date, cart, discountApplied, subtotal, discount, total };
-                    const blob = new Blob([JSON.stringify(invoiceData, null, 2)], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `invoice_${customerName}_${date.replace(/\//g, '-')}.json`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                    showToast('💾 Invoice saved as JSON');
+                    const invoiceData = { 
+                        customerName, 
+                        date, 
+                        cart, 
+                        discountApplied, 
+                        subtotal, 
+                        discount, 
+                        total 
+                    };
+                    
+                    // Save for 24h with versioned filename
+                    const uniqueFileName = saveInvoiceFor24h(invoiceData, baseFileName);
+                    
+                    // Refresh the page to show updated saved invoices list
+                    window.location.href = `?view=invoice&name=${encodeURIComponent(customerName)}&date=${date}`;
+                    
+                    showToast(`✅ Invoice saved as: ${uniqueFileName}`);
                 });
 
                 // Pay button: open modal with customer name pre-filled
@@ -719,7 +860,6 @@
                 const data = { cart, discountApplied };
                 sessionStorage.setItem('currentInvoice', JSON.stringify(data));
                 const today = new Date(); const dateStr = today.getFullYear()+'-'+(today.getMonth()+1).toString().padStart(2,'0')+'-'+today.getDate().toString().padStart(2,'0');
-                // Use a default name until user enters it on invoice page
                 window.location.href = `?view=invoice&name=Guest&date=${dateStr}`;
             }
 
@@ -779,7 +919,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="text-center mt-5 text-secondary">✦ 175+ products · discount on invoice · Pay on invoice page ✦</div>
+                    <div class="text-center mt-5 text-secondary">✦ 175+ products · discount · Versioned saved invoices ✦</div>
                 </div>
             `;
             container.innerHTML = shopHtml;
@@ -801,7 +941,7 @@
             document.getElementById('generateInvoiceBtn').addEventListener('click', generateInvoice);
             document.getElementById('cartBadge').addEventListener('click', generateInvoice);
 
-            // Payment modal confirmation (global, works on invoice page)
+            // Payment modal confirmation
             document.getElementById('confirmPaymentBtn')?.addEventListener('click', () => {
                 const name = document.getElementById('modalCustomerName').value.trim();
                 if (!name) { alert('Please enter customer name'); return; }
