@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeoGrocery Pro · 175+ products · ذخیره‌سازی با Save</title>
+    <title>NeoGrocery Pro · 175+ products · Save Invoice</title>
     <!-- Font Awesome 6 (free) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Google Font: Outfit (modern) -->
@@ -114,6 +114,11 @@
             box-shadow: 0 20px 35px rgba(0,45,80,0.2);
             border: 1px solid #dae9ff;
             position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .cart-badge:hover {
+            background: #f0f7ff;
         }
         .cart-badge i {
             color: #1f5282;
@@ -666,7 +671,7 @@
 
     <script>
         (function() {
-            // ---------- PRODUCT CATALOG (75 items from previous version) ----------
+            // ---------- PRODUCT CATALOG (75 base products) ----------
             const baseProducts = [
                 { id: 'rice', name: 'Basmati Rice', emoji: '🍚', price: 4.80, category: 'pantry', catName: 'Pantry' },
                 { id: 'oil', name: 'Olive Oil', emoji: '🫒', price: 3.50, category: 'pantry', catName: 'Pantry' },
@@ -867,7 +872,7 @@
                         const data = JSON.parse(current);
                         cart = data.cart || [];
                         discountApplied = data.discountApplied || 0;
-                        sessionStorage.removeItem('currentInvoice'); // consume it
+                        sessionStorage.removeItem('currentInvoice');
                     }
                 } catch (e) {}
 
@@ -1164,6 +1169,24 @@
                 document.getElementById('cartItemCount').textContent = count;
             }
 
+            // Shared function to generate invoice
+            function generateInvoice() {
+                const name = document.getElementById('customerName').value.trim();
+                if (!name) { alert('Please enter customer name'); return; }
+                if (cart.length === 0) { alert('Cart is empty'); return; }
+
+                // Store in sessionStorage for invoice page
+                const data = { cart, discountApplied };
+                sessionStorage.setItem('currentInvoice', JSON.stringify(data));
+
+                // Add to history
+                const today = new Date();
+                const dateStr = today.getFullYear()+'-'+(today.getMonth()+1).toString().padStart(2,'0')+'-'+today.getDate().toString().padStart(2,'0');
+                addToHistory(name, cart, discountApplied, dateStr);
+
+                window.location.href = `?view=invoice&name=${encodeURIComponent(name)}&date=${dateStr}`;
+            }
+
             // Build main shop UI
             const shopHtml = `
                 <div class="header">
@@ -1176,7 +1199,7 @@
                         <input type="text" id="searchInput" placeholder="Search 175+ products..." value="">
                         <button id="searchBtn"><i class="fas fa-arrow-right-long"></i></button>
                     </div>
-                    <div class="cart-badge">
+                    <div class="cart-badge" id="cartBadge">
                         <i class="fas fa-cart-shopping"></i>
                         <span id="cartItemCount">0</span>
                     </div>
@@ -1241,7 +1264,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="footer-note">✦ 175+ products · discount on invoice · 24h storage option ✦</div>
+                <div class="footer-note">✦ 175+ products · discount on invoice · Save as JSON ✦</div>
             `;
             container.innerHTML = shopHtml;
 
@@ -1284,23 +1307,11 @@
                 renderCart();
             });
 
-            // Generate pre‑invoice – بدون پیغام، مستقیماً ذخیره در sessionStorage و هدایت
-            document.getElementById('generateInvoiceBtn').addEventListener('click', () => {
-                const name = document.getElementById('customerName').value.trim();
-                if (!name) { alert('Please enter customer name'); return; }
-                if (cart.length === 0) { alert('Cart is empty'); return; }
+            // Generate invoice from button
+            document.getElementById('generateInvoiceBtn').addEventListener('click', generateInvoice);
 
-                // ذخیره در sessionStorage برای نمایش در صفحه پیش‌فاکتور
-                const data = { cart, discountApplied };
-                sessionStorage.setItem('currentInvoice', JSON.stringify(data));
-
-                // اضافه کردن به تاریخچه
-                const today = new Date();
-                const dateStr = today.getFullYear()+'-'+(today.getMonth()+1).toString().padStart(2,'0')+'-'+today.getDate().toString().padStart(2,'0');
-                addToHistory(name, cart, discountApplied, dateStr);
-
-                window.location.href = `?view=invoice&name=${encodeURIComponent(name)}&date=${dateStr}`;
-            });
+            // Generate invoice from cart icon
+            document.getElementById('cartBadge').addEventListener('click', generateInvoice);
 
             document.getElementById('simulatePaymentBtn').addEventListener('click', () => {
                 const name = document.getElementById('customerName').value.trim();
