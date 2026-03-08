@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeoGrocery Pro · 175+ products · ذخیره‌سازی با Save</title>
+    <!-- Font Awesome 6 (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Font: Outfit (modern) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+        body {
+            background: radial-gradient(circle at 20% 30%, #ecf5ff, #ffffff);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .pro-container {
+            max-width: 1800px;
+            width: 100%;
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 70px;
+            box-shadow: 0 50px 90px rgba(0,30,70,0.3), 0 0 0 1.5px rgba(255,255,255,0.8) inset;
+            padding: 35px 40px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .brand-icon {
+            font-size: 3.8rem;
+            color: #1a4d7a;
+            filter: drop-shadow(0 12px 18px #aaccff);
+            animation: float 4s infinite ease-in-out;
+        }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0); }
+        }
+        .brand-name {
+            font-weight: 800;
+            font-size: 2.8rem;
+            background: linear-gradient(145deg, #0e3b60, #2a70aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+        .search-wrapper {
+            flex: 1 1 380px;
+            display: flex;
+            background: white;
+            border-radius: 80px;
+            padding: 6px 6px 6px 28px;
+            box-shadow: 0 20px 35px rgba(0,45,80,0.15);
+            border: 1px solid #d1e5ff;
+        }
+        .search-wrapper:focus-within {
+            box-shadow: 0 20px 40px #abc4e6;
+        }
+        .search-wrapper i {
+            color: #517ea8;
+            font-size: 1.3rem;
+            align-self: center;
+        }
+        .search-wrapper input {
+            border: none;
+            outline: none;
+            flex: 1;
+            padding: 16px 14px;
+            font-size: 1.1rem;
+            background: transparent;
+        }
+        .search-wrapper button {
+            background: #113355;
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 14px 34px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 20px #0b2f4f;
+        }
+        .cart-badge {
+            background: white;
+            border-radius: 60px;
+            padding: 14px 32px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 700;
+            font-size: 1.4rem;
+            box-shadow: 0 20px 35px rgba(0,45,80,0.2);
+            border: 1px solid #dae9ff;
+            position: relative;
+        }
+        .cart-badge i {
+            color: #1f5282;
+            font-size: 2rem;
+        }
+        .cart-count {
+            background: #fb5;
+            color: #1e2f40;
+            border-radius: 40px;
+            padding: 2px 12px;
+            font-size: 1rem;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            border: 2px solid white;
+        }
+        .category-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 35px;
+        }
+        .cat-pill {
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(4px);
+            padding: 18px 32px;
+            border-radius: 70px;
+            font-weight: 600;
+            font-size: 1.15rem;
+            border: 1px solid rgba(90,150,230,0.3);
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 12px 20px rgba(0,25,60,0.08);
+            color: #1c4468;
+        }
+        .cat-pill.active {
+            background: #1c4c7a;
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 20px 30px #0f3a60;
+            transform: scale(1.03);
+        }
+        .cat-pill i {
+            margin-right: 12px;
+        }
+        .main-panel {
+            display: grid;
+            grid-template-columns: 1.7fr 1fr;
+            gap: 35px;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 24px;
+        }
+        .product-card {
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(8px);
+            border-radius: 44px;
+            padding: 26px 18px 22px;
+            box-shadow: 0 25px 40px rgba(0,50,80,0.15);
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+            border: 1px solid rgba(255,255,255,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+        }
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, #fff6d0, transparent 70%);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .product-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            border-color: #ffdb9f;
+            box-shadow: 0 40px 60px rgba(0,80,150,0.3);
+        }
+        .product-emoji {
+            font-size: 4.5rem;
+            line-height: 1;
+            margin-bottom: 8px;
+            filter: drop-shadow(0 12px 14px rgba(0,0,0,0.1));
+            transition: 0.2s;
+        }
+        .product-card:hover .product-emoji {
+            transform: rotate(5deg) scale(1.05);
+        }
+        .product-name {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #103a5e;
+        }
+        .product-cat-tag {
+            font-size: 0.85rem;
+            background: #e6f0ff;
+            padding: 6px 18px;
+            border-radius: 40px;
+            margin: 12px 0 8px;
+            font-weight: 600;
+            color: #1c5282;
+        }
+        .price-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            width: 100%;
+            margin: 8px 0 12px;
+        }
+        .product-price {
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: #0b3d66;
+        }
+        .qty-selector {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 8px;
+            width: 100%;
+        }
+        .qty-btn {
+            background: white;
+            border: none;
+            width: 52px;
+            height: 52px;
+            border-radius: 50px;
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #1f4f82;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,40,80,0.15);
+            transition: 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #c4deff;
+        }
+        .qty-btn:hover {
+            background: #e5f0ff;
+            transform: scale(1.1);
+        }
+        .qty-value {
+            font-weight: 700;
+            font-size: 1.8rem;
+            min-width: 40px;
+            text-align: center;
+            color: #123e64;
+        }
+        .cart-panel {
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(18px);
+            border-radius: 64px;
+            padding: 34px 30px;
+            box-shadow: 0 35px 60px rgba(0,45,85,0.25);
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+        .cart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+        .cart-title {
+            font-size: 2.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #103a5e;
+        }
+        .clear-cart {
+            background: rgba(220,235,255,0.8);
+            border: none;
+            padding: 12px 22px;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #1f4a7a;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .clear-cart:hover {
+            background: #fb5;
+            color: #200;
+        }
+        .cart-items {
+            max-height: 330px;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-bottom: 25px;
+            scrollbar-width: thin;
+        }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.7);
+            border-radius: 70px;
+            padding: 14px 18px 14px 24px;
+            margin-bottom: 14px;
+            border: 1px solid #d1e4ff;
+            transition: 0.2s;
+        }
+        .cart-item:hover {
+            background: rgba(255,255,255,0.9);
+            border-color: #fb5;
+        }
+        .cart-item-left {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .cart-item-name {
+            font-weight: 600;
+            font-size: 1.15rem;
+        }
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ecf3fd;
+            border-radius: 50px;
+            padding: 6px 10px;
+        }
+        .cart-item-controls button {
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f4a7a;
+            cursor: pointer;
+            width: 32px;
+            transition: 0.1s;
+        }
+        .cart-item-controls button:hover {
+            color: #fb5;
+        }
+        .cart-item-qty {
+            font-weight: 700;
+            min-width: 24px;
+            text-align: center;
+        }
+        .cart-item-price {
+            font-weight: 700;
+            color: #103a5e;
+            font-size: 1.15rem;
+            min-width: 75px;
+            text-align: right;
+        }
+        .remove-item {
+            background: none;
+            border: none;
+            color: #9bb9dd;
+            font-size: 1.4rem;
+            margin-left: 5px;
+        }
+        .subtotal {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 2rem;
+            border-top: 3px dashed #b2cceb;
+            padding-top: 22px;
+            margin: 22px 0 12px;
+            color: #0d3251;
+        }
+        .discount-row {
+            display: flex;
+            gap: 14px;
+            margin: 20px 0;
+        }
+        .discount-row input {
+            flex: 1;
+            padding: 18px 24px;
+            border: 1px solid #b9d2f0;
+            border-radius: 70px;
+            background: white;
+            font-size: 1.05rem;
+        }
+        .discount-row button {
+            background: #e3efff;
+            border: none;
+            border-radius: 70px;
+            padding: 0 32px;
+            font-weight: 600;
+            color: #103a5e;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .discount-row button:hover {
+            background: #cbe0fe;
+        }
+        .total-line {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 800;
+            font-size: 2rem;
+            margin: 10px 0 25px;
+            color: #0b3b60;
+        }
+        .customer-field {
+            margin: 25px 0;
+        }
+        .customer-field label {
+            font-weight: 600;
+            color: #1f4f82;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        .customer-field input {
+            width: 100%;
+            padding: 20px 26px;
+            border: 1px solid #b9d2f0;
+            border-radius: 70px;
+            font-size: 1.1rem;
+            background: white;
+        }
+        .payment-details {
+            background: rgba(255,255,255,0.6);
+            border-radius: 56px;
+            padding: 30px;
+            margin: 25px 0;
+        }
+        .payment-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+        .payment-field {
+            display: flex;
+            flex-direction: column;
+        }
+        .payment-field label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #2f6ea2;
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+        }
+        .payment-field input {
+            padding: 18px 22px;
+            border: 1px solid #b9d2f0;
+            border-radius: 60px;
+            background: white;
+        }
+        .bank-group {
+            display: flex;
+            gap: 35px;
+            flex-wrap: wrap;
+            margin: 25px 0 20px;
+        }
+        .bank-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        .revolut-note {
+            background: #dcf0ff;
+            border-radius: 70px;
+            padding: 20px 28px;
+            font-size: 1.1rem;
+            color: #014a81;
+            border: 1px solid #9cc0f0;
+            margin: 25px 0;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            flex: 1 1 210px;
+            padding: 20px 20px;
+            border: none;
+            border-radius: 70px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 20px 35px -5px #0f3455;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+        }
+        .btn-primary {
+            background: #113355;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1f5282;
+            transform: scale(0.98);
+        }
+        .btn-secondary {
+            background: white;
+            color: #113355;
+            border: 1px solid #b9d6ff;
+        }
+        .btn-secondary:hover {
+            background: #ecf5ff;
+        }
+        .invoice-container {
+            background: white;
+            border-radius: 70px;
+            padding: 60px;
+            box-shadow: 0 45px 85px rgba(0,30,70,0.3);
+        }
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 5px solid #113355;
+            padding-bottom: 30px;
+            margin-bottom: 45px;
+            flex-wrap: wrap;
+        }
+        .invoice-title {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #113355;
+        }
+        .invoice-meta p {
+            font-size: 1.3rem;
+            color: #345e88;
+        }
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 45px 0;
+        }
+        .invoice-table th {
+            background: #e3efff;
+            padding: 20px 18px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .invoice-table td {
+            padding: 20px 18px;
+            border-bottom: 1px solid #c9ddfc;
+            font-size: 1.1rem;
+        }
+        .invoice-total {
+            font-size: 3rem;
+            font-weight: 800;
+            text-align: right;
+            border-top: 5px solid #113355;
+            padding-top: 35px;
+        }
+        .print-actions {
+            display: flex;
+            gap: 25px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .print-btn, .back-btn, .save-btn {
+            padding: 22px 45px;
+            border-radius: 70px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            font-size: 1.4rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            transition: 0.2s;
+        }
+        .print-btn { background: #113355; color: white; }
+        .back-btn { background: #e2ecff; color: #113355; }
+        .save-btn { background: #27ae60; color: white; }
+        .save-btn:hover { background: #2ecc71; }
+        .history-section {
+            margin-top: 40px;
+            padding: 20px;
+            background: #e8f2ff;
+            border-radius: 60px;
+        }
+        .history-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #113355;
+            margin-bottom: 20px;
+        }
+        .history-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .history-link {
+            background: white;
+            padding: 12px 24px;
+            border-radius: 60px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            cursor: pointer;
+            border: 1px solid #b9d6ff;
+            font-weight: 600;
+            color: #113355;
+            transition: 0.2s;
+        }
+        .history-link:hover {
+            background: #fb5;
+            color: #1e2f40;
+        }
+        @media print {
+            .print-actions, .back-btn, .footer-note, .history-section { display: none; }
+            body { background: white; }
+            .pro-container { background: white; backdrop-filter: none; box-shadow: none; padding: 0; }
+        }
+        .footer-note {
+            text-align: center;
+            color: #5f82aa;
+            margin-top: 35px;
+            font-size: 1.2rem;
+        }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1f4f82;
+            color: white;
+            padding: 16px 30px;
+            border-radius: 60px;
+            font-weight: 600;
+            box-shadow: 0 15px 30px #0f3455;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="pro-container" id="appContainer"></div>
+    <div class="toast" id="toast">✨ Item added</div>
+
+    <script>
+        (function() {
+            // ---------- PRODUCT CATALOG (75 items from previous version) ----------
+            const baseProducts = [
+                { id: 'rice', name: 'Basmati Rice', emoji: '🍚', price: 4.80, category: 'pantry', catName: 'Pantry' },
+                { id: 'oil', name: 'Olive Oil', emoji: '🫒', price: 3.50, category: 'pantry', catName: 'Pantry' },
+                { id: 'toothbrush', name: 'Eco Toothbrush', emoji: '🪥', price: 2.25, category: 'personal', catName: 'Personal' },
+                { id: 'coffee', name: 'Colombian Coffee', emoji: '☕', price: 7.15, category: 'beverage', catName: 'Beverage' },
+                { id: 'biscuit', name: 'Choc Biscuit', emoji: '🍪', price: 0.65, category: 'snack', catName: 'Snack' },
+                { id: 'candy', name: 'Fruit Candy', emoji: '🍬', price: 0.40, category: 'snack', catName: 'Snack' },
+                { id: 'egg', name: 'Free‑range Eggs', emoji: '🥚', price: 0.30, category: 'fresh', catName: 'Fresh' },
+                { id: 'milk', name: 'Oat Milk', emoji: '🥛', price: 2.10, category: 'beverage', catName: 'Beverage' },
+                { id: 'chips', name: 'Kettle Chips', emoji: '🍟', price: 1.25, category: 'snack', catName: 'Snack' },
+                { id: 'soap', name: 'Aloe Soap', emoji: '🧼', price: 1.90, category: 'personal', catName: 'Personal' },
+                { id: 'bread', name: 'Sourdough', emoji: '🍞', price: 2.30, category: 'bakery', catName: 'Bakery' },
+                { id: 'butter', name: 'Salted Butter', emoji: '🧈', price: 2.95, category: 'dairy', catName: 'Dairy' },
+                { id: 'cheese', name: 'Cheddar', emoji: '🧀', price: 3.60, category: 'dairy', catName: 'Dairy' },
+                { id: 'yogurt', name: 'Greek Yogurt', emoji: '🥤', price: 1.85, category: 'dairy', catName: 'Dairy' },
+                { id: 'apple', name: 'Honeycrisp', emoji: '🍎', price: 0.95, category: 'fresh', catName: 'Fresh' },
+                { id: 'banana', name: 'Banana bunch', emoji: '🍌', price: 1.15, category: 'fresh', catName: 'Fresh' },
+                { id: 'carrot', name: 'Organic Carrots', emoji: '🥕', price: 1.20, category: 'fresh', catName: 'Fresh' },
+                { id: 'pasta', name: 'Spaghetti', emoji: '🍝', price: 1.50, category: 'pantry', catName: 'Pantry' },
+                { id: 'sauce', name: 'Tomato Sauce', emoji: '🥫', price: 1.40, category: 'pantry', catName: 'Pantry' },
+                { id: 'cereal', name: 'Oat Cereal', emoji: '🥣', price: 3.20, category: 'pantry', catName: 'Pantry' },
+                { id: 'tea', name: 'Earl Grey', emoji: '🫖', price: 2.80, category: 'beverage', catName: 'Beverage' },
+                { id: 'lemonade', name: 'Sparkling Lemon', emoji: '🍋', price: 1.95, category: 'beverage', catName: 'Beverage' },
+                { id: 'chocolate', name: 'Dark Chocolate', emoji: '🍫', price: 2.50, category: 'snack', catName: 'Snack' },
+                { id: 'icecream', name: 'Vanilla Ice Cream', emoji: '🍦', price: 3.75, category: 'snack', catName: 'Snack' },
+                { id: 'shampoo', name: 'Herbal Shampoo', emoji: '🧴', price: 4.20, category: 'personal', catName: 'Personal' },
+                { id: 'chicken_breast', name: 'Chicken Breast', emoji: '🍗', price: 5.99, category: 'meat', catName: 'Meat' },
+                { id: 'ground_beef', name: 'Ground Beef', emoji: '🥩', price: 6.50, category: 'meat', catName: 'Meat' },
+                { id: 'bacon', name: 'Smoked Bacon', emoji: '🥓', price: 4.80, category: 'meat', catName: 'Meat' },
+                { id: 'salmon', name: 'Atlantic Salmon', emoji: '🐟', price: 8.25, category: 'meat', catName: 'Meat' },
+                { id: 'shrimp', name: 'Raw Shrimp', emoji: '🍤', price: 7.90, category: 'meat', catName: 'Meat' },
+                { id: 'pork_chops', name: 'Pork Chops', emoji: '🥩', price: 5.40, category: 'meat', catName: 'Meat' },
+                { id: 'lamb_leg', name: 'Leg of Lamb', emoji: '🐑', price: 9.30, category: 'meat', catName: 'Meat' },
+                { id: 'sausages', name: 'Pork Sausages', emoji: '🌭', price: 3.99, category: 'meat', catName: 'Meat' },
+                { id: 'frozen_peas', name: 'Frozen Peas', emoji: '🫛', price: 1.80, category: 'frozen', catName: 'Frozen' },
+                { id: 'frozen_pizza', name: 'Margherita Pizza', emoji: '🍕', price: 4.50, category: 'frozen', catName: 'Frozen' },
+                { id: 'frozen_berries', name: 'Mixed Berries', emoji: '🫐', price: 3.20, category: 'frozen', catName: 'Frozen' },
+                { id: 'frozen_fish', name: 'Fish Fillets', emoji: '🐟', price: 5.60, category: 'frozen', catName: 'Frozen' },
+                { id: 'frozen_veggies', name: 'Mixed Veggies', emoji: '🥦', price: 2.30, category: 'frozen', catName: 'Frozen' },
+                { id: 'frozen_waffles', name: 'Waffles', emoji: '🧇', price: 2.90, category: 'frozen', catName: 'Frozen' },
+                { id: 'laundry_detergent', name: 'Laundry Detergent', emoji: '🧴', price: 6.25, category: 'household', catName: 'Household' },
+                { id: 'dish_soap', name: 'Dish Soap', emoji: '🧼', price: 2.10, category: 'household', catName: 'Household' },
+                { id: 'paper_towels', name: 'Paper Towels', emoji: '🧻', price: 3.40, category: 'household', catName: 'Household' },
+                { id: 'trash_bags', name: 'Trash Bags', emoji: '🗑️', price: 4.15, category: 'household', catName: 'Household' },
+                { id: 'sponges', name: 'Sponges', emoji: '🧽', price: 1.95, category: 'household', catName: 'Household' },
+                { id: 'aluminium_foil', name: 'Aluminium Foil', emoji: '📦', price: 2.50, category: 'household', catName: 'Household' },
+                { id: 'orange_juice', name: 'Orange Juice', emoji: '🍊', price: 2.80, category: 'beverage', catName: 'Beverage' },
+                { id: 'apple_juice', name: 'Apple Juice', emoji: '🧃', price: 2.60, category: 'beverage', catName: 'Beverage' },
+                { id: 'soda', name: 'Cola Soda', emoji: '🥤', price: 1.75, category: 'beverage', catName: 'Beverage' },
+                { id: 'sparkling_water', name: 'Sparkling Water', emoji: '💧', price: 1.20, category: 'beverage', catName: 'Beverage' },
+                { id: 'peanuts', name: 'Roasted Peanuts', emoji: '🥜', price: 2.30, category: 'snack', catName: 'Snack' },
+                { id: 'popcorn', name: 'Popcorn', emoji: '🍿', price: 1.99, category: 'snack', catName: 'Snack' },
+                { id: 'pretzels', name: 'Pretzels', emoji: '🥨', price: 2.10, category: 'snack', catName: 'Snack' },
+                { id: 'granola_bar', name: 'Granola Bar', emoji: '🍫', price: 1.40, category: 'snack', catName: 'Snack' },
+                { id: 'gummy_bears', name: 'Gummy Bears', emoji: '🧸', price: 1.85, category: 'snack', catName: 'Snack' },
+                { id: 'cheddar_crackers', name: 'Cheddar Crackers', emoji: '🧀', price: 2.20, category: 'snack', catName: 'Snack' },
+                { id: 'bagels', name: 'Bagels', emoji: '🥯', price: 2.50, category: 'bakery', catName: 'Bakery' },
+                { id: 'croissant', name: 'Croissant', emoji: '🥐', price: 1.95, category: 'bakery', catName: 'Bakery' },
+                { id: 'muffin', name: 'Blueberry Muffin', emoji: '🧁', price: 2.20, category: 'bakery', catName: 'Bakery' },
+                { id: 'baguette', name: 'Baguette', emoji: '🥖', price: 1.70, category: 'bakery', catName: 'Bakery' },
+                { id: 'donut', name: 'Glazed Donut', emoji: '🍩', price: 1.50, category: 'bakery', catName: 'Bakery' },
+                { id: 'cream_cheese', name: 'Cream Cheese', emoji: '🧀', price: 2.10, category: 'dairy', catName: 'Dairy' },
+                { id: 'sour_cream', name: 'Sour Cream', emoji: '🥛', price: 1.60, category: 'dairy', catName: 'Dairy' },
+                { id: 'cottage_cheese', name: 'Cottage Cheese', emoji: '🧀', price: 2.30, category: 'dairy', catName: 'Dairy' },
+                { id: 'whipped_cream', name: 'Whipped Cream', emoji: '🥛', price: 1.90, category: 'dairy', catName: 'Dairy' },
+                { id: 'buttermilk', name: 'Buttermilk', emoji: '🥛', price: 1.45, category: 'dairy', catName: 'Dairy' },
+                { id: 'strawberries', name: 'Strawberries', emoji: '🍓', price: 2.99, category: 'fresh', catName: 'Fresh' },
+                { id: 'blueberries', name: 'Blueberries', emoji: '🫐', price: 3.20, category: 'fresh', catName: 'Fresh' },
+                { id: 'spinach', name: 'Baby Spinach', emoji: '🥬', price: 2.10, category: 'fresh', catName: 'Fresh' },
+                { id: 'broccoli', name: 'Broccoli', emoji: '🥦', price: 1.80, category: 'fresh', catName: 'Fresh' },
+                { id: 'cauliflower', name: 'Cauliflower', emoji: '🥦', price: 1.90, category: 'fresh', catName: 'Fresh' },
+                { id: 'tomatoes', name: 'Tomatoes', emoji: '🍅', price: 2.00, category: 'fresh', catName: 'Fresh' },
+                { id: 'cucumber', name: 'Cucumber', emoji: '🥒', price: 1.20, category: 'fresh', catName: 'Fresh' },
+                { id: 'avocado', name: 'Avocado', emoji: '🥑', price: 1.60, category: 'fresh', catName: 'Fresh' },
+                { id: 'onions', name: 'Onions', emoji: '🧅', price: 1.10, category: 'fresh', catName: 'Fresh' },
+                { id: 'garlic', name: 'Garlic', emoji: '🧄', price: 0.90, category: 'fresh', catName: 'Fresh' }
+            ];
+
+            // ---------- ADD 100 MORE PRODUCTS (programmatically) ----------
+            const extraCategories = [
+                { id: 'condiments', label: 'Condiments', icon: 'fa-solid fa-jar' },
+                { id: 'international', label: 'International', icon: 'fa-solid fa-globe' },
+                { id: 'baby', label: 'Baby', icon: 'fa-solid fa-baby' }
+            ];
+
+            const categories = [
+                { id: 'all', label: 'All', icon: 'fa-solid fa-grid-2' },
+                { id: 'pantry', label: 'Pantry', icon: 'fa-solid fa-jar' },
+                { id: 'beverage', label: 'Beverage', icon: 'fa-solid fa-mug-hot' },
+                { id: 'snack', label: 'Snack', icon: 'fa-solid fa-cookie' },
+                { id: 'personal', label: 'Personal', icon: 'fa-solid fa-soap' },
+                { id: 'fresh', label: 'Fresh', icon: 'fa-solid fa-leaf' },
+                { id: 'bakery', label: 'Bakery', icon: 'fa-solid fa-bread-slice' },
+                { id: 'dairy', label: 'Dairy', icon: 'fa-solid fa-cheese' },
+                { id: 'meat', label: 'Meat', icon: 'fa-solid fa-drumstick-bite' },
+                { id: 'frozen', label: 'Frozen', icon: 'fa-regular fa-snowflake' },
+                { id: 'household', label: 'Household', icon: 'fa-solid fa-house-chimney' },
+                ...extraCategories
+            ];
+
+            const newProducts = [];
+            const catList = ['pantry', 'beverage', 'snack', 'personal', 'fresh', 'bakery', 'dairy', 'meat', 'frozen', 'household', 'condiments', 'international', 'baby'];
+            const catNames = {
+                pantry: 'Pantry', beverage: 'Beverage', snack: 'Snack', personal: 'Personal', fresh: 'Fresh',
+                bakery: 'Bakery', dairy: 'Dairy', meat: 'Meat', frozen: 'Frozen', household: 'Household',
+                condiments: 'Condiments', international: 'International', baby: 'Baby'
+            };
+            const emojiPools = {
+                pantry: ['🍚','🍝','🥫','🥣','🌾','🧂','🍯','🥜','🌽','🍞'],
+                beverage: ['🧃','🥤','🧋','🍵','☕','🍹','🍺','🥂','🍷','🥛'],
+                snack: ['🍪','🍫','🍬','🍭','🍮','🍩','🍿','🥨','🥜','🍰'],
+                personal: ['🧴','🧼','🪥','🧽','🧻','🪒','💄','👕','🧦','👖'],
+                fresh: ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥬','🥒','🌶️','🫑','🌽','🥕','🧄','🧅'],
+                bakery: ['🍞','🥖','🥨','🥯','🥐','🍰','🧁','🥧','🍪','🍩'],
+                dairy: ['🥛','🧀','🥚','🍦','🍨','🍧','🍮','🧈','🥤'],
+                meat: ['🍗','🥩','🍖','🌭','🥓','🍔','🍟','🍕','🌮','🥙'],
+                frozen: ['❄️','🍦','🍨','🥟','🍕','🥦','🫐','🍤','🍣','🥧'],
+                household: ['🧴','🧼','🧽','🧻','🗑️','🧹','🧺','🔦','🔋','💡'],
+                condiments: ['🥫','🍯','🧂','🌶️','🧄','🧅','🍋','🍊','🍅','🌿'],
+                international: ['🍣','🍱','🍛','🍜','🍝','🍲','🥘','🌮','🌯','🥗'],
+                baby: ['🍼','🥣','🧴','🧸','🧦','👕','👖','🧢','🧻','🛁']
+            };
+
+            let idCounter = 1000;
+            for (let i = 0; i < 100; i++) {
+                const cat = catList[Math.floor(Math.random() * catList.length)];
+                const catName = catNames[cat];
+                const emojiPool = emojiPools[cat] || ['📦'];
+                const emoji = emojiPool[Math.floor(Math.random() * emojiPool.length)];
+                const adjectives = ['Organic', 'Natural', 'Premium', 'Classic', 'Deluxe', 'Fresh', 'Pure', 'Fine', 'Gourmet', 'Artisan'];
+                const nouns = ['Selection', 'Pack', 'Essentials', 'Delights', 'Favorites', 'Harvest', 'Blend', 'Mix', 'Treats', 'Goods'];
+                const name = `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${catName} ${nouns[Math.floor(Math.random() * nouns.length)]} ${i+1}`;
+                const price = Math.round((0.5 + Math.random() * 12.5) * 100) / 100;
+                newProducts.push({
+                    id: `gen_${idCounter + i}`,
+                    name: name,
+                    emoji: emoji,
+                    price: price,
+                    category: cat,
+                    catName: catName
+                });
+            }
+
+            const products = [...baseProducts, ...newProducts];
+
+            const formatMoney = (amount) => '£' + amount.toFixed(2);
+            const toast = document.getElementById('toast');
+
+            function showToast(msg) {
+                toast.textContent = msg;
+                toast.style.opacity = '1';
+                setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+            }
+
+            function escapeHtml(unsafe) {
+                return unsafe.replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+            }
+
+            // ---------- FUNCTION TO ADD TO HISTORY ----------
+            function addToHistory(customerName, cart, discountApplied, dateStr) {
+                let history = [];
+                try {
+                    const stored = localStorage.getItem('invoiceHistory');
+                    if (stored) history = JSON.parse(stored);
+                } catch (e) {}
+                const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+                const discount = discountApplied ? subtotal * 0.1 : 0;
+                const total = subtotal - discount;
+                const historyItem = {
+                    customerName,
+                    date: dateStr,
+                    total,
+                    cart,
+                    discountApplied,
+                    timestamp: Date.now()
+                };
+                history.unshift(historyItem);
+                if (history.length > 20) history = history.slice(0, 20);
+                localStorage.setItem('invoiceHistory', JSON.stringify(history));
+            }
+
+            // URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            const view = urlParams.get('view');
+            const container = document.getElementById('appContainer');
+
+            // ---------- INVOICE PAGE ----------
+            if (view === 'invoice') {
+                const customerName = urlParams.get('name') || 'Guest';
+                const date = urlParams.get('date') || new Date().toLocaleDateString('en-GB');
+                let cart = [];
+                let discountApplied = 0;
+
+                // Try to get from sessionStorage (current invoice)
+                try {
+                    const current = sessionStorage.getItem('currentInvoice');
+                    if (current) {
+                        const data = JSON.parse(current);
+                        cart = data.cart || [];
+                        discountApplied = data.discountApplied || 0;
+                        sessionStorage.removeItem('currentInvoice'); // consume it
+                    }
+                } catch (e) {}
+
+                // If not found, maybe it's a history view (stored in session by history link)
+                if (cart.length === 0) {
+                    try {
+                        const historyView = sessionStorage.getItem('historyView');
+                        if (historyView) {
+                            const data = JSON.parse(historyView);
+                            cart = data.cart || [];
+                            discountApplied = data.discountApplied || 0;
+                            sessionStorage.removeItem('historyView');
+                        }
+                    } catch (e) {}
+                }
+
+                let rows = '';
+                let subtotal = 0;
+                if (cart.length === 0) {
+                    rows = '<tr><td colspan="4" style="text-align:center; padding:60px;">No items selected.</td></tr>';
+                } else {
+                    cart.forEach(item => {
+                        const line = item.price * item.qty;
+                        subtotal += line;
+                        rows += `<tr><td>${item.emoji} ${item.name}</td><td>${item.qty}</td><td>${formatMoney(item.price)}</td><td>${formatMoney(line)}</td></tr>`;
+                    });
+                }
+                const discount = discountApplied ? subtotal * 0.1 : 0;
+                const total = subtotal - discount;
+
+                // Build history section
+                let historyHtml = '';
+                try {
+                    const history = JSON.parse(localStorage.getItem('invoiceHistory')) || [];
+                    const sameCustomer = history.filter(h => h.customerName.toLowerCase() === customerName.toLowerCase());
+                    if (sameCustomer.length > 0) {
+                        let links = '';
+                        sameCustomer.forEach((item, index) => {
+                            links += `<span class="history-link" data-history-index="${index}">${item.date} - ${formatMoney(item.total)}</span>`;
+                        });
+                        historyHtml = `
+                            <div class="history-section">
+                                <div class="history-title"><i class="fas fa-history"></i> Previous purchases for ${escapeHtml(customerName)}</div>
+                                <div class="history-links" id="historyLinks">
+                                    ${links}
+                                </div>
+                            </div>
+                        `;
+                    }
+                } catch (e) {}
+
+                const invoiceHtml = `
+                    <div class="invoice-container">
+                        <div class="invoice-header">
+                            <div class="invoice-title">🧾 tax invoice</div>
+                            <div class="invoice-meta">
+                                <p><strong>Customer:</strong> ${escapeHtml(customerName)}</p>
+                                <p><strong>Date:</strong> ${escapeHtml(date)}</p>
+                            </div>
+                        </div>
+                        <table class="invoice-table">
+                            <thead><tr><th>Item</th><th>Qty</th><th>Unit price</th><th>Total</th></tr></thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                        ${cart.length > 0 ? `
+                        <div style="text-align:right; font-size:1.8rem; margin:20px 0;">
+                            <div>Subtotal: ${formatMoney(subtotal)}</div>
+                            ${discountApplied ? `<div>Discount (10%): -${formatMoney(discount)}</div>` : ''}
+                            <div style="font-weight:800; font-size:2.5rem;">Total: ${formatMoney(total)}</div>
+                        </div>
+                        ` : ''}
+                        <div style="background:#e8f2ff; border-radius:80px; padding:22px 35px; margin:40px 0;">
+                            <i class="fas fa-university"></i> Store Revolut: <strong>GB29 REVO 0099 1234 5678 90</strong>
+                        </div>
+                        <div class="print-actions">
+                            <button class="print-btn" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+                            <button class="save-btn" id="saveInvoiceBtn"><i class="fas fa-download"></i> Save</button>
+                            <a href="?view=" class="back-btn"><i class="fas fa-arrow-left"></i> Continue shopping</a>
+                        </div>
+                        ${historyHtml}
+                    </div>
+                `;
+                container.innerHTML = invoiceHtml;
+
+                // Save button: download JSON
+                document.getElementById('saveInvoiceBtn').addEventListener('click', () => {
+                    const invoiceData = {
+                        customerName,
+                        date,
+                        cart,
+                        discountApplied,
+                        subtotal,
+                        discount,
+                        total,
+                        generatedAt: new Date().toISOString()
+                    };
+                    const blob = new Blob([JSON.stringify(invoiceData, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `invoice_${customerName}_${date.replace(/\//g, '-')}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    showToast('💾 Invoice saved as JSON');
+                });
+
+                // History link clicks
+                if (historyHtml) {
+                    const history = JSON.parse(localStorage.getItem('invoiceHistory')) || [];
+                    const sameCustomer = history.filter(h => h.customerName.toLowerCase() === customerName.toLowerCase());
+                    document.querySelectorAll('.history-link').forEach((link, idx) => {
+                        link.addEventListener('click', () => {
+                            const item = sameCustomer[idx];
+                            sessionStorage.setItem('historyView', JSON.stringify({ cart: item.cart, discountApplied: item.discountApplied }));
+                            window.location.href = `?view=invoice&name=${encodeURIComponent(item.customerName)}&date=${item.date}`;
+                        });
+                    });
+                }
+                return;
+            }
+
+            // ---------- SHOP VIEW ----------
+            let cart = [];
+            let activeCategory = 'all';
+            let searchQuery = '';
+            let discountApplied = 0;
+
+            function renderCategories() {
+                let html = '';
+                categories.forEach(cat => {
+                    html += `<div class="cat-pill ${activeCategory === cat.id ? 'active' : ''}" data-cat="${cat.id}"><i class="fas ${cat.icon}"></i> ${cat.label}</div>`;
+                });
+                document.getElementById('categoryStrip').innerHTML = html;
+                document.querySelectorAll('.cat-pill').forEach(pill => {
+                    pill.addEventListener('click', () => {
+                        activeCategory = pill.dataset.cat;
+                        renderCategories();
+                        filterAndRenderProducts();
+                    });
+                });
+            }
+
+            function getFilteredProducts() {
+                return products.filter(p => {
+                    if (activeCategory !== 'all' && p.category !== activeCategory) return false;
+                    if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+                    return true;
+                });
+            }
+
+            function renderProducts() {
+                const filtered = getFilteredProducts();
+                let gridHtml = '';
+                filtered.forEach(prod => {
+                    const cartItem = cart.find(c => c.id === prod.id);
+                    const qty = cartItem ? cartItem.qty : 0;
+                    gridHtml += `
+                        <div class="product-card">
+                            <div class="product-emoji">${prod.emoji}</div>
+                            <div class="product-name">${prod.name}</div>
+                            <div class="product-cat-tag"><i class="fa-regular fa-bookmark"></i> ${prod.catName}</div>
+                            <div class="price-row">
+                                <span class="product-price">${formatMoney(prod.price)}</span>
+                            </div>
+                            <div class="qty-selector">
+                                <button class="qty-btn dec" data-id="${prod.id}">−</button>
+                                <span class="qty-value" id="qty-${prod.id}">${qty}</span>
+                                <button class="qty-btn inc" data-id="${prod.id}">+</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                if (filtered.length === 0) gridHtml = '<div style="text-align:center; padding:60px; background:rgba(255,255,255,0.5); border-radius:90px;">✨ nothing matches, try another category ✨</div>';
+                document.getElementById('productsGrid').innerHTML = gridHtml;
+                document.querySelectorAll('.inc').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.dataset.id;
+                        const product = products.find(p => p.id === id);
+                        const existing = cart.find(c => c.id === id);
+                        if (existing) existing.qty += 1;
+                        else cart.push({ id: product.id, name: product.name, emoji: product.emoji, price: product.price, qty: 1, catName: product.catName });
+                        document.getElementById(`qty-${id}`).textContent = existing ? existing.qty : 1;
+                        renderCart();
+                        updateCartBadge();
+                        showToast(`➕ ${product.name} added`);
+                    });
+                });
+                document.querySelectorAll('.dec').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.dataset.id;
+                        const index = cart.findIndex(c => c.id === id);
+                        if (index !== -1) {
+                            if (cart[index].qty > 1) {
+                                cart[index].qty -= 1;
+                                document.getElementById(`qty-${id}`).textContent = cart[index].qty;
+                            } else {
+                                cart.splice(index, 1);
+                                document.getElementById(`qty-${id}`).textContent = '0';
+                            }
+                            renderCart();
+                            updateCartBadge();
+                        }
+                    });
+                });
+            }
+
+            function filterAndRenderProducts() { renderProducts(); }
+
+            function renderCart() {
+                const cartContainer = document.getElementById('cartItems');
+                const subtotalSpan = document.getElementById('subtotalValue');
+                const discountSpan = document.getElementById('discountValue');
+                const totalSpan = document.getElementById('totalAfterDiscount');
+                if (!cartContainer) return;
+                let subtotal = 0;
+                if (cart.length === 0) {
+                    cartContainer.innerHTML = '<div style="text-align:center; color:#789fc7; padding:35px;">your cart is empty ✨</div>';
+                } else {
+                    let html = '';
+                    cart.forEach((item, idx) => {
+                        const line = item.price * item.qty;
+                        subtotal += line;
+                        html += `
+                            <div class="cart-item">
+                                <div class="cart-item-left">
+                                    <span>${item.emoji}</span>
+                                    <span class="cart-item-name">${item.name}</span>
+                                    <div class="cart-item-controls">
+                                        <button class="cart-dec" data-index="${idx}">−</button>
+                                        <span class="cart-item-qty">${item.qty}</span>
+                                        <button class="cart-inc" data-index="${idx}">+</button>
+                                    </div>
+                                </div>
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <span class="cart-item-price">${formatMoney(line)}</span>
+                                    <button class="remove-item" data-index="${idx}"><i class="fas fa-trash-can"></i></button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    cartContainer.innerHTML = html;
+                }
+                subtotalSpan.textContent = formatMoney(subtotal);
+                let discount = discountApplied ? subtotal * 0.1 : 0;
+                discountSpan.textContent = '-' + formatMoney(discount);
+                totalSpan.textContent = formatMoney(subtotal - discount);
+
+                document.querySelectorAll('.cart-inc').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = btn.dataset.index;
+                        cart[idx].qty += 1;
+                        syncQtyFromCart(cart[idx].id);
+                        renderCart();
+                        updateCartBadge();
+                    });
+                });
+                document.querySelectorAll('.cart-dec').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = btn.dataset.index;
+                        if (cart[idx].qty > 1) {
+                            cart[idx].qty -= 1;
+                        } else {
+                            const removedId = cart[idx].id;
+                            cart.splice(idx, 1);
+                            document.getElementById(`qty-${removedId}`).textContent = '0';
+                        }
+                        syncQtyFromCart(cart[idx]?.id);
+                        renderCart();
+                        updateCartBadge();
+                    });
+                });
+                document.querySelectorAll('.remove-item').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const idx = btn.dataset.index;
+                        const removedId = cart[idx].id;
+                        cart.splice(idx, 1);
+                        const qtySpan = document.getElementById(`qty-${removedId}`);
+                        if (qtySpan) qtySpan.textContent = '0';
+                        renderCart();
+                        updateCartBadge();
+                    });
+                });
+            }
+
+            function syncQtyFromCart(productId) {
+                if (!productId) return;
+                const item = cart.find(c => c.id === productId);
+                const span = document.getElementById(`qty-${productId}`);
+                if (span) span.textContent = item ? item.qty : 0;
+            }
+
+            function updateCartBadge() {
+                const count = cart.reduce((acc, i) => acc + i.qty, 0);
+                document.getElementById('cartItemCount').textContent = count;
+            }
+
+            // Build main shop UI
+            const shopHtml = `
+                <div class="header">
+                    <div class="brand">
+                        <i class="fas fa-bag-shopping brand-icon"></i>
+                        <span class="brand-name">NeoGrocery Pro</span>
+                    </div>
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search 175+ products..." value="">
+                        <button id="searchBtn"><i class="fas fa-arrow-right-long"></i></button>
+                    </div>
+                    <div class="cart-badge">
+                        <i class="fas fa-cart-shopping"></i>
+                        <span id="cartItemCount">0</span>
+                    </div>
+                </div>
+
+                <div class="category-strip" id="categoryStrip"></div>
+
+                <div class="main-panel">
+                    <div class="products-grid" id="productsGrid"></div>
+                    <div class="cart-panel">
+                        <div class="cart-header">
+                            <div class="cart-title"><i class="fas fa-basket-shopping"></i> your cart</div>
+                            <button class="clear-cart" id="clearCartBtn"><i class="fas fa-trash-alt"></i> clear</button>
+                        </div>
+                        <div class="cart-items" id="cartItems"></div>
+                        <div class="discount-row">
+                            <input type="text" id="discountInput" placeholder="Promo code (SAVE10)">
+                            <button id="applyDiscount">Apply</button>
+                        </div>
+                        <div class="subtotal">
+                            <span>Subtotal</span>
+                            <span id="subtotalValue">£0.00</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:1.4rem; margin:5px 0; color:#1e4e7a;">
+                            <span>Discount</span>
+                            <span id="discountValue">-£0.00</span>
+                        </div>
+                        <div class="total-line">
+                            <span>Total</span>
+                            <span id="totalAfterDiscount">£0.00</span>
+                        </div>
+
+                        <div class="customer-field">
+                            <label><i class="fas fa-user"></i> Customer name</label>
+                            <input type="text" id="customerName" placeholder="e.g. Taylor Chen">
+                        </div>
+
+                        <div class="payment-details">
+                            <div style="font-weight:700; margin-bottom:20px;">💳 payment details</div>
+                            <div class="payment-row">
+                                <div class="payment-field"><label>Account number</label><input id="accNumber" placeholder="12345678"></div>
+                                <div class="payment-field"><label>Sort code</label><input id="sortCode" placeholder="12-34-56"></div>
+                            </div>
+                            <div class="payment-row">
+                                <div class="payment-field"><label>Expiry (MM/YY)</label><input id="expiry" placeholder="12/25"></div>
+                                <div class="payment-field"><label>CVV</label><input id="cvv" placeholder="123" maxlength="3"></div>
+                            </div>
+                            <div class="bank-group">
+                                <label class="bank-option"><input type="radio" name="bank" value="Halifax" checked> Halifax</label>
+                                <label class="bank-option"><input type="radio" name="bank" value="LLOYDS"> Lloyds</label>
+                                <label class="bank-option"><input type="radio" name="bank" value="Revolut"> Revolut</label>
+                            </div>
+                        </div>
+
+                        <div class="revolut-note">
+                            <i class="fas fa-building-columns"></i> Store Revolut: <strong>GB29 REVO 0099 1234 5678 90</strong>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" id="generateInvoiceBtn"><i class="fas fa-file-invoice"></i> pre‑invoice</button>
+                            <button class="btn btn-secondary" id="simulatePaymentBtn"><i class="fas fa-circle-check"></i> pay now</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-note">✦ 175+ products · discount on invoice · 24h storage option ✦</div>
+            `;
+            container.innerHTML = shopHtml;
+
+            renderCategories();
+            renderProducts();
+            renderCart();
+            updateCartBadge();
+
+            document.getElementById('searchBtn').addEventListener('click', () => {
+                searchQuery = document.getElementById('searchInput').value;
+                renderProducts();
+            });
+            document.getElementById('searchInput').addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') {
+                    searchQuery = e.target.value;
+                    renderProducts();
+                }
+            });
+
+            document.getElementById('clearCartBtn').addEventListener('click', () => {
+                cart = [];
+                products.forEach(p => {
+                    const span = document.getElementById(`qty-${p.id}`);
+                    if (span) span.textContent = '0';
+                });
+                renderCart();
+                updateCartBadge();
+                showToast('🧹 Cart cleared');
+            });
+
+            document.getElementById('applyDiscount').addEventListener('click', () => {
+                const code = document.getElementById('discountInput').value.trim();
+                if (code.toUpperCase() === 'SAVE10') {
+                    discountApplied = 0.1;
+                    showToast('✅ 10% discount applied!');
+                } else {
+                    discountApplied = 0;
+                    showToast('❌ Invalid code');
+                }
+                renderCart();
+            });
+
+            // Generate pre‑invoice – بدون پیغام، مستقیماً ذخیره در sessionStorage و هدایت
+            document.getElementById('generateInvoiceBtn').addEventListener('click', () => {
+                const name = document.getElementById('customerName').value.trim();
+                if (!name) { alert('Please enter customer name'); return; }
+                if (cart.length === 0) { alert('Cart is empty'); return; }
+
+                // ذخیره در sessionStorage برای نمایش در صفحه پیش‌فاکتور
+                const data = { cart, discountApplied };
+                sessionStorage.setItem('currentInvoice', JSON.stringify(data));
+
+                // اضافه کردن به تاریخچه
+                const today = new Date();
+                const dateStr = today.getFullYear()+'-'+(today.getMonth()+1).toString().padStart(2,'0')+'-'+today.getDate().toString().padStart(2,'0');
+                addToHistory(name, cart, discountApplied, dateStr);
+
+                window.location.href = `?view=invoice&name=${encodeURIComponent(name)}&date=${dateStr}`;
+            });
+
+            document.getElementById('simulatePaymentBtn').addEventListener('click', () => {
+                const name = document.getElementById('customerName').value.trim();
+                if (!name) { alert('Enter name'); return; }
+                if (cart.length === 0) { alert('Cart empty'); return; }
+                const acc = document.getElementById('accNumber').value.trim();
+                const sort = document.getElementById('sortCode').value.trim();
+                const expiry = document.getElementById('expiry').value.trim();
+                const cvv = document.getElementById('cvv').value.trim();
+                if (!acc || !sort || !expiry || !cvv) { alert('Fill all payment fields'); return; }
+                if (!/^\d{6,}$/.test(acc.replace(/\s/g, ''))) { alert('Account number must be at least 6 digits'); return; }
+                if (sort.replace(/\D/g, '').length !== 6) { alert('Sort code must be 6 digits'); return; }
+                if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) { alert('Expiry must be MM/YY'); return; }
+                if (!/^\d{3}$/.test(cvv)) { alert('CVV must be 3 digits'); return; }
+                const bank = document.querySelector('input[name="bank"]:checked')?.value || 'Halifax';
+                const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+                const discount = discountApplied ? subtotal * 0.1 : 0;
+                const total = subtotal - discount;
+                alert(`✅ Payment simulated via ${bank}\nCustomer: ${name}\nTotal: ${formatMoney(total)}\nTransferred to store's Revolut: GB29 REVO 0099 1234 5678 90`);
+                showToast('💸 Payment successful (demo)');
+            });
+        })();
+    </script>
+</body>
+</html>
